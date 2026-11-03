@@ -1,0 +1,22 @@
+import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(1)
+n = 300
+log = pd.DataFrame({
+    "user": rng.choice(["ali", "sara", "yacine", "nour", "karim"], n),
+    "hour": rng.integers(0, 24, n),
+    "failed_attempts": rng.poisson(0.4, n),
+    "country": rng.choice(["DZ", "FR", "TN", "RU"], n, p=[.7, .15, .1, .05]),
+    "duration_min": rng.gamma(2, 8, n).round(1)
+})
+
+random_indices = rng.choice(n, 12, replace=False)
+log.loc[random_indices, 'failed_attempts'] = rng.integers(5, 12, size=12)
+
+missing_indices = rng.choice(n, 10, replace=False)
+log.loc[missing_indices, 'duration_min'] = np.nan
+
+log['long_session'] = (log['duration_min'] > 30).astype(int)
+
+log.to_csv("logins_clean.csv", index=False)
